@@ -26,10 +26,28 @@ public class TcpSocketController {
 
     /**
      * The method that returns the next available socket in the list of available sockets
-     * @return a TCP socket available for connection
+     * @return a TCP socket available for connection, or null if the list is empty
      */
     public static TcpSocket getNextAvailableSocket() {
-        return availableTcpSockets.get(0);
+        try {
+            return availableTcpSockets.get(0);
+        }
+        catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    /**
+     * The method that returns the next connected socket in the list of connected sockets
+     * @return a TCP socket in connection, or null if the list is empty
+     */
+    public static TcpSocket getNextConnectedSocket() {
+        try {
+            return connectedTcpSockets.get(0);
+        }
+        catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     /**
@@ -52,7 +70,10 @@ public class TcpSocketController {
         }
 
         // Add the socket to the list of connected sockets
-        connectedTcpSockets.add(connectedSocket);
+        if (connectedSocket != null)
+            connectedTcpSockets.add(connectedSocket);
+
+        ParseFile.rewriteConfigPeerFile();
     }
 
     /**
@@ -75,7 +96,10 @@ public class TcpSocketController {
         }
 
         // Add the socket to the list of available sockets
-        availableTcpSockets.add(availableSocket);
+        if (availableSocket != null)
+            availableTcpSockets.add(availableSocket);
+
+        ParseFile.rewriteConfigPeerFile();
     }
 
     /**
@@ -84,12 +108,15 @@ public class TcpSocketController {
      */
     public static void disconnectAllSockets() {
         // Disconnect all sockets and add them to the list of available sockets
-        for (TcpSocket socket : connectedTcpSockets) {
+        while (getNextConnectedSocket() != null)
+            availableTcpSockets.add(connectedTcpSockets.remove(0));
+
+        for (TcpSocket socket : availableTcpSockets)
             socket.disconnectedFromPeer();
-            availableTcpSockets.add(socket);
-        }
 
         // Empty the list of connected sockets
         connectedTcpSockets = new ArrayList<TcpSocket>();
+
+        ParseFile.rewriteConfigPeerFile();
     }
 }

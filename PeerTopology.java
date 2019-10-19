@@ -145,6 +145,9 @@ public class PeerTopology {
      */
     public void sendAck(InetAddress ipAddr, int udpPort) {
         try {
+            // Update the current list of available ports from the TCP socket controller
+            //ParseFile.updateAvailablePorts();
+
             // For each available port on the local machine, the protocol sends out an acknowledgment back to the remote peer
             for (Integer tcpPorts : ParseFile.getConfigPorts()) {
 

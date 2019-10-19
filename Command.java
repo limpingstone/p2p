@@ -9,6 +9,16 @@ public class Command {
         switch (param[0]) {
             case "":
                 return;
+            case "list":
+                System.out.println("Available Sockets:");
+                for (TcpSocket socket : TcpSocketController.availableTcpSockets) {
+                    System.out.println(socket.getId());
+                }
+                System.out.println("Connected Sockets:");
+                for (TcpSocket socket : TcpSocketController.connectedTcpSockets) {
+                    System.out.println(socket.getId());
+                }
+                break;
             case "Connect":
             case "connect":
                 try {
@@ -26,6 +36,7 @@ public class Command {
             case "Leave":
             case "leave":
                 TcpSocketController.disconnectAllSockets();
+                System.out.println("Closed all active TCP connection");
                 break;
 
             case "Exit":
@@ -64,18 +75,9 @@ public class Command {
     }
 
     public static void connect(String ipAddrStr, String portStr) {
-        //try {
-            System.out.println("Connecting to peer...");
-            TcpSocket peerSocket = TcpSocketController.getNextAvailableSocket();
-            peerSocket.connectToPeer(ipAddrStr, Integer.parseInt(portStr));
-            System.out.println("Connected!!!");
-        /*}
-        catch (UnknownHostException e) {
-            System.out.println("Error: unknown host " + ipAddrStr + " on port " + portStr);
-        }
-        catch (IOException e) {
-            System.out.println("Error: Socket connection failed");
-        }
-        */
+        System.out.println("Connecting to peer...");
+        TcpSocket peerSocket = TcpSocketController.getNextAvailableSocket();
+        peerSocket.connectToPeer(ipAddrStr, Integer.parseInt(portStr));
     }
 }
+

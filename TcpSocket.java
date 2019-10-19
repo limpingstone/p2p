@@ -32,20 +32,21 @@ public class TcpSocket extends ServerSocket {
     }
 
     /**
-     * The method that initializes the socket connection with a peer
+     * The method that actively initializes the socket connection with a peer
      * @param ipAddrStr hostname of the peer in the format of string
      * @param port port number of the peer in the format of int
      */
     public void connectToPeer(String ipAddrStr, int port) {
         try {
             connectionSocket = new Socket(ipAddrStr, port);
+            TcpSocketController.socketConnected(this.getId());
+            System.out.println("Connected to peer at " + ipAddrStr + " on port " + port + "!");
 
-            // Set up the incoming and outbound stream of data
-            incomingFromPeer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-            outboundToPeer = new DataOutputStream(connectionSocket.getOutputStream());
-
-            // Wait for incoming stream from the peer
-            while (parseStream(readFromPeer()) != null);
+            new Thread(new Runnable() {
+                public void run() {
+                    setupDataTransfer();
+                }
+            }).start();
         }
         catch (IOException e) {
             System.out.println("TCP connection failed");
@@ -53,32 +54,36 @@ public class TcpSocket extends ServerSocket {
     }
 
     /**
-     * The method that handles the established connection with a peer
+     * The method that handles the incoming established connection with a peer
      */
     public void connectedToPeer() {
         try {
             // Mark the socket as connected with the socket controller
-            connectionSocket = this.accept();
+            // If the TCP socket is connected by the user, the socket cannot be used by other peers
+            // If the TCP socket is not connected, the socket can accept from other peers
+            if (connectionSocket == null) {
+                connectionSocket = this.accept();
+            }
             TcpSocketController.socketConnected(this.getId());
-            System.out.println("Available Sockets:");
-            for (TcpSocket socket : TcpSocketController.availableTcpSockets) {
-                System.out.println(socket.getId());
-            }
-            System.out.println("Connected Sockets:");
-            for (TcpSocket socket : TcpSocketController.connectedTcpSockets) {
-                System.out.println(socket.getId());
-            }
-            System.out.println();
 
+            setupDataTransfer();
+        }
+        catch (IOException e) {
+            System.out.println("TCP connection failed. Please try another peer or port");
+        }
+    }
+
+    public void setupDataTransfer() {
+        try {
             // Set up the incoming and outbound stream of data
             incomingFromPeer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
             outboundToPeer = new DataOutputStream(connectionSocket.getOutputStream());
 
             // Wait for incoming stream from the peer
-            while (parseStream(readFromPeer()) != null);
+            //while (parseStream(readFromPeer()) != null);
         }
         catch (IOException e) {
-            System.out.println("TCP connection failed");
+            System.out.println("Error setting up data transmission");
         }
     }
 
@@ -89,13 +94,14 @@ public class TcpSocket extends ServerSocket {
     public boolean disconnectedFromPeer() {
         try {
             if (connectionSocket != null) {
+                writeToPeer("Hey I am gonna be gone to Pittsburgh so see yah");
+
                 // Close the data stream
                 incomingFromPeer.close();
                 outboundToPeer.close();
 
                 // Close the connection
                 connectionSocket.close();
-                System.out.println("Socket closed");
 
                 // Remove the socket from the list of connected sockets
                 TcpSocketController.socketDisconnected(this.getId());

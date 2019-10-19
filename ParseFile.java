@@ -36,6 +36,34 @@ public class ParseFile {
     }
 
     /**
+     * The static method that updates the available ports according to the TCP socket controller
+     */
+    public static void updateAvailablePorts() {
+        availableLocalPorts = new ArrayList<Integer>();
+        for (TcpSocket socket : TcpSocketController.availableTcpSockets)
+            availableLocalPorts.add(new Integer(socket.getPort()));
+    }
+
+    /**
+     * The static method that updates the config_peer.txt file with the available sockets
+     * This will be called every time there is a modification to the list of available sockets
+     */
+    public static void rewriteConfigPeerFile() {
+        try {
+            FileWriter configPeerWriter = new FileWriter("config_peer.txt", false);
+            for (TcpSocket socket : TcpSocketController.availableTcpSockets) {
+                configPeerWriter.write(socket.getPort() + "\n");
+            }
+
+            configPeerWriter.flush();
+            configPeerWriter.close();
+        }
+        catch (IOException e) {
+            System.out.println("Error reading from config_peer.txt");
+        }
+    }
+
+    /**
      * The static method that removes the port number that is being used, in which the file config_peer.txt is rewritten
      * @return the port number that is being used in the format of int
      */
