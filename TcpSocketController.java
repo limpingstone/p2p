@@ -84,7 +84,7 @@ public class TcpSocketController {
      */
     public static void disconnectAllSockets() {
         // Disconnect all sockets and add them to the list of available sockets
-        for (TcpSocket socket : availableTcpSockets) {
+        for (TcpSocket socket : connectedTcpSockets) {
             socket.disconnectedFromPeer();
             availableTcpSockets.add(socket);
         }

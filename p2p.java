@@ -20,9 +20,6 @@ public class p2p {
 
         // Meanwhile initializes the TCP sockets
         TcpSocketController.initTcpSockets();
-        for (TcpSocket socket : TcpSocketController.availableTcpSockets) {
-            System.out.println(socket.getPort());
-        }
 
         // List the available peers obtained from the discovery protocol
         System.out.println();

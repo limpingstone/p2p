@@ -37,7 +37,19 @@ public class TcpSocket extends ServerSocket {
      * @param port port number of the peer in the format of int
      */
     public void connectToPeer(String ipAddrStr, int port) {
+        try {
+            connectionSocket = new Socket(ipAddrStr, port);
 
+            // Set up the incoming and outbound stream of data
+            incomingFromPeer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+            outboundToPeer = new DataOutputStream(connectionSocket.getOutputStream());
+
+            // Wait for incoming stream from the peer
+            while (parseStream(readFromPeer()) != null);
+        }
+        catch (IOException e) {
+            System.out.println("TCP connection failed");
+        }
     }
 
     /**
@@ -76,19 +88,21 @@ public class TcpSocket extends ServerSocket {
      */
     public boolean disconnectedFromPeer() {
         try {
-            // Close the data stream
-            incomingFromPeer.close();
-            outboundToPeer.close();
+            if (connectionSocket != null) {
+                // Close the data stream
+                incomingFromPeer.close();
+                outboundToPeer.close();
 
-            // Close the connection
-            connectionSocket.close();
-            System.out.println("Socket closed");
+                // Close the connection
+                connectionSocket.close();
+                System.out.println("Socket closed");
 
-            // Remove the socket from the list of connected sockets
-            TcpSocketController.socketDisconnected(this.getId());
+                // Remove the socket from the list of connected sockets
+                TcpSocketController.socketDisconnected(this.getId());
 
-            // Return true if the above process is handled successfully
-            return true;
+                // Return true if the above process is handled successfully
+                return true;
+            }
         }
         catch (IOException e) {
             System.out.println("Error closing socket");
