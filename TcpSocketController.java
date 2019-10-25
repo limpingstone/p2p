@@ -13,15 +13,7 @@ public class TcpSocketController {
      * The IDs are for the TCP sockets to self identify its position in the array list
      */
     public static void initTcpSockets() {
-        try {
-            int id = 1000;
-            for (Integer portNum : ParseFile.getConfigPorts()) {
-                availableTcpSockets.add(new TcpSocket(portNum.intValue(), id++));
-            }
-        }
-        catch (IOException e) {
-            System.out.println("TCP Socket Error");
-        }
+        ParseFile.loadConfigPeerFile();
     }
 
     /**
@@ -73,7 +65,7 @@ public class TcpSocketController {
         if (connectedSocket != null)
             connectedTcpSockets.add(connectedSocket);
 
-        ParseFile.rewriteConfigPeerFile();
+        ParseFile.writeConfigPeerFile();
     }
 
     /**
@@ -99,7 +91,7 @@ public class TcpSocketController {
         if (availableSocket != null)
             availableTcpSockets.add(availableSocket);
 
-        ParseFile.rewriteConfigPeerFile();
+        ParseFile.writeConfigPeerFile();
     }
 
     /**
@@ -117,6 +109,6 @@ public class TcpSocketController {
         // Empty the list of connected sockets
         connectedTcpSockets = new ArrayList<TcpSocket>();
 
-        ParseFile.rewriteConfigPeerFile();
+        ParseFile.writeConfigPeerFile();
     }
 }

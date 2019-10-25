@@ -13,7 +13,7 @@ clean:
 	rm -f PeerTopology*.class
 	rm -f NetworkUtil.class
 	rm -f ParseFile.class
-	rm -f TcpSocket.class
+	rm -f TcpSocket*.class
 	rm -f TcpSocketController.class
 
 upload: 
