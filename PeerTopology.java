@@ -152,7 +152,7 @@ public class PeerTopology {
             for (TcpSocket tcpPort : TcpSocketController.availableTcpSockets) {
 
                 // The data sent contains the available port number
-                byte[] peerData = Integer.toString(tcpPort.getPort()).getBytes();
+                byte[] peerData = Integer.toString(tcpPort.getLocalPort()).getBytes();
                 DatagramPacket availablePeerPacket = new DatagramPacket(peerData, peerData.length, ipAddr, udpPort);
                 udpSocket.send(availablePeerPacket);
             }

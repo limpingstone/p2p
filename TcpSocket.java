@@ -4,7 +4,7 @@ import java.util.*;
 
 public class TcpSocket extends ServerSocket {
     // Port number of the socket
-    private int port;
+    private int localPort;
 
     // A unique ID to identify the individual sockets from one another
     private int id;
@@ -18,9 +18,9 @@ public class TcpSocket extends ServerSocket {
     // Handles outbound data stream
     private DataOutputStream outboundToPeer;
 
-    public TcpSocket(int port, int id) throws IOException {
-        super(port);
-        this.port = port;
+    public TcpSocket(int localPort, int id) throws IOException {
+        super(localPort);
+        this.localPort = localPort;
         this.id = id;
 
         // Make the socket readily available in the background
@@ -158,11 +158,15 @@ public class TcpSocket extends ServerSocket {
         return streamStr;
     }
 
-    public int getPort() {
-        return port;
+    public int getLocalPort() {
+        return localPort;
     }
 
     public int getId() {
         return id;
+    }
+
+    public Socket getConnectionSocket() {
+        return connectionSocket;
     }
 }

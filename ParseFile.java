@@ -27,7 +27,7 @@ public class ParseFile {
         try {
             FileWriter configPeerWriter = new FileWriter("config_peer.txt", false);
             for (TcpSocket socket : TcpSocketController.availableTcpSockets) {
-                configPeerWriter.write(socket.getPort() + "\n");
+                configPeerWriter.write(socket.getLocalPort() + "\n");
             }
 
             configPeerWriter.flush();
@@ -35,6 +35,25 @@ public class ParseFile {
         }
         catch (IOException e) {
             System.out.println("Error writing to config_peer.txt");
+        }
+    }
+
+    /**
+     * The static method that updates the config_neighbors.txt file with the connected sockets
+     * This will be called every time there is a modification to the list of connected sockets
+     */
+    public static void writeConfigNeighborsFile() {
+        try {
+            FileWriter configNeighborsWriter = new FileWriter("config_neighbors.txt", false);
+            for (TcpSocket socket : TcpSocketController.connectedTcpSockets) {
+                configNeighborsWriter.write(socket.getConnectionSocket().getRemoteSocketAddress().toString().substring(1) +  "\n");
+            }
+
+            configNeighborsWriter.flush();
+            configNeighborsWriter.close();
+        }
+        catch (IOException e) {
+            System.out.println("Error writing to config_neighbors.txt");
         }
     }
 }

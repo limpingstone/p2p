@@ -116,7 +116,7 @@ public class Command {
      */
     public static void getFile(String filename) {
         for (TcpSocket activeSocket : TcpSocketController.connectedTcpSockets) {
-            System.out.println("Sent query to " + activeSocket.getPort());
+            System.out.println("Sent query to " + activeSocket.getLocalPort());
             activeSocket.writeToPeer("Q:<query id>;" + filename + '\n');
         }
     }

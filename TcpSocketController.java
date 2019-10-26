@@ -65,7 +65,9 @@ public class TcpSocketController {
         if (connectedSocket != null)
             connectedTcpSockets.add(connectedSocket);
 
+        // Updates the config_peer.txt and config_neighbors.txt files
         ParseFile.writeConfigPeerFile();
+        ParseFile.writeConfigNeighborsFile();
     }
 
     /**
@@ -91,7 +93,9 @@ public class TcpSocketController {
         if (availableSocket != null)
             availableTcpSockets.add(availableSocket);
 
+        // Updates the config_peer.txt and config_neighbors.txt files
         ParseFile.writeConfigPeerFile();
+        ParseFile.writeConfigNeighborsFile();
     }
 
     /**
@@ -109,6 +113,8 @@ public class TcpSocketController {
         // Empty the list of connected sockets
         connectedTcpSockets = new ArrayList<TcpSocket>();
 
+        // Updates the config_peer.txt and config_neighbors.txt files
         ParseFile.writeConfigPeerFile();
+        ParseFile.writeConfigNeighborsFile();
     }
 }
