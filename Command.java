@@ -31,6 +31,10 @@ public class Command {
 
             case "Get":
             case "get":
+                for (TcpSocket activeSocket : TcpSocketController.connectedTcpSockets) {
+                    System.out.println("Sent query to " + activeSocket.getPort());
+                    activeSocket.writeToPeer("Q:<query id>;<file name>" + '\n');
+                }
                 break;
 
             case "Leave":

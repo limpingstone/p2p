@@ -80,7 +80,8 @@ public class TcpSocket extends ServerSocket {
             outboundToPeer = new DataOutputStream(connectionSocket.getOutputStream());
 
             // Wait for incoming stream from the peer
-            //while (parseStream(readFromPeer()) != null);
+            while (parseStream(readFromPeer()) != null);
+
         }
         catch (IOException e) {
             System.out.println("Error setting up data transmission");
@@ -93,15 +94,16 @@ public class TcpSocket extends ServerSocket {
      */
     public boolean disconnectedFromPeer() {
         try {
+            // If connectionSocket is linked with other peers
             if (connectionSocket != null) {
-                writeToPeer("Hey I am gonna be gone to Pittsburgh so see yah");
+
+                // Close the connection
+                // Has to be done before closing the data stream so the socket could send a null packet to terminate the readline method
+                connectionSocket.close();
 
                 // Close the data stream
                 incomingFromPeer.close();
                 outboundToPeer.close();
-
-                // Close the connection
-                connectionSocket.close();
 
                 // Remove the socket from the list of connected sockets
                 TcpSocketController.socketDisconnected(this.getId());
@@ -116,13 +118,20 @@ public class TcpSocket extends ServerSocket {
         return false;
     }
 
+    /**
+     * The method that reads messages from peer
+     * @return a string read from the incoming string reader, or null if the socket is closed
+     */
     public String readFromPeer() {
         try {
+            // Return the message sent from peer
             return incomingFromPeer.readLine();
         }
         catch (IOException e) {
-            System.out.println("Error reading from socket");
+            System.out.println("Peer socket closed");
         }
+
+        // Return null if the socket to peer is closed
         return null;
     }
 
@@ -135,7 +144,7 @@ public class TcpSocket extends ServerSocket {
             outboundToPeer.writeBytes(message);
         }
         catch (IOException e) {
-            System.out.println("Error writing to socket (ID " + getId() + ")" );
+            System.out.println("Error writing to socket (ID " + getId() + ")");
         }
     }
 
@@ -144,7 +153,8 @@ public class TcpSocket extends ServerSocket {
      * @param streamStr a string received from the peer
      */
     public String parseStream(String streamStr) {
-        System.out.println("Message from socket: " + streamStr);
+        if (streamStr != null)
+            System.out.println("Message from socket: " + streamStr);
         return streamStr;
     }
 
