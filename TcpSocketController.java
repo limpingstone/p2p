@@ -8,6 +8,8 @@ public class TcpSocketController {
     // The array list of TCP sockets that are in active connection with a peer
     public static ArrayList<TcpSocket> connectedTcpSockets = new ArrayList<TcpSocket>();
 
+    public static ArrayList<String> queryIdList = new ArrayList<String>();
+
     /**
      * The static method that initializes all the TCP sockets and add them into the array list of available TCP sockets
      * The IDs are for the TCP sockets to self identify its position in the array list
@@ -117,4 +119,16 @@ public class TcpSocketController {
         ParseFile.writeConfigPeerFile();
         ParseFile.writeConfigNeighborsFile();
     }
+
+    public static void passOnQuery(String queryId, String queryFile, int socketId) {
+        queryIdList.add(queryId);
+
+        for (TcpSocket socket : connectedTcpSockets) {
+            if (socketId != socket.getId()) {
+                socket.writeToPeer("Q:<query_id>; " + queryFile + '\n');
+                System.out.println("Passed on the query!");
+            }
+        }
+    }
 }
+

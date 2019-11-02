@@ -153,8 +153,10 @@ public class TcpSocket extends ServerSocket {
      * @param streamStr a string received from the peer
      */
     public String parseStream(String streamStr) {
-        if (streamStr != null)
-            System.out.println("Message from socket: " + streamStr);
+        if (streamStr != null) {
+            System.out.println("\nMessage from socket: " + streamStr);
+            TcpSocketController.passOnQuery(streamStr.substring(2).split(";")[0], streamStr.split(" ")[1], getId());
+        }
         return streamStr;
     }
 

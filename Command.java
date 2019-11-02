@@ -43,7 +43,10 @@ public class Command {
             // send to all neighboring peers a query of the filename
             case "Get":
             case "get":
-                getFile(param[1]);
+                if (param.length > 1)
+                    getFile(param[1]);
+                else
+                    help(true);
                 break;
 
             // disconnects all connection with peers
@@ -117,7 +120,7 @@ public class Command {
     public static void getFile(String filename) {
         for (TcpSocket activeSocket : TcpSocketController.connectedTcpSockets) {
             System.out.println("Sent query to " + activeSocket.getLocalPort());
-            activeSocket.writeToPeer("Q:<query id>;" + filename + '\n');
+            activeSocket.writeToPeer("Q:<query_id>; " + filename + '\n');
         }
     }
 }
