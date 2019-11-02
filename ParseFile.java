@@ -60,13 +60,13 @@ public class ParseFile {
     /**
      * The static method that searches whether the indicated file exists
      * @param searchedName the name of the file in the form of string
-     * @return true if the file is found in the obtained folder
+     * @return true if the file is found in the shared folder
      */
     public static boolean fileFound(String searchedName) {
         final String filename = searchedName;
-        File obtainedDir = new File("obtained");
+        File sharedDir = new File("shared");
 
-        File[] searchResult = obtainedDir.listFiles(new FilenameFilter() {
+        File[] searchResult = sharedDir.listFiles(new FilenameFilter() {
             public boolean accept(File file, String name) {
                 return name.startsWith(filename);
             }
@@ -78,13 +78,13 @@ public class ParseFile {
     /**
      * The static method that returns the list of files with matched filenames
      * @param searchedName the name of the file in the form of string
-     * @return the list of file names found in the obtained folder
+     * @return the list of file names found in the shared folder
      */
     public static ArrayList<String> getExactNames(String searchedName) {
         final String filename = searchedName;
-        File obtainedDir = new File("obtained");
+        File sharedDir = new File("shared");
 
-        File[] searchResult = obtainedDir.listFiles(new FilenameFilter() {
+        File[] searchResult = sharedDir.listFiles(new FilenameFilter() {
             public boolean accept(File file, String name) {
                 return name.startsWith(filename);
             }
