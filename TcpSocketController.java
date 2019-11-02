@@ -8,6 +8,7 @@ public class TcpSocketController {
     // The array list of TCP sockets that are in active connection with a peer
     public static ArrayList<TcpSocket> connectedTcpSockets = new ArrayList<TcpSocket>();
 
+    // The array containing the list of query ID's that has been processed and passed on
     public static ArrayList<String> queryIdList = new ArrayList<String>();
 
     /**
@@ -130,16 +131,16 @@ public class TcpSocketController {
             }
             else if (ParseFile.fileFound(queryFile)) {
                 for (String match : ParseFile.getExactNames(queryFile))
-                    socket.writeToPeer("R:<query_id>;peer_ip:port;" + match + '\n');
+                    socket.writeToPeer("R:<query_id>;" + NetworkUtil.getOwnExternalIp() + ":" + getNextAvailableSocket().getLocalPort() + ";" + match + '\n');
             }
 
         }
     }
 
-    public static void passOnResponse(String queryId, String ipAddr, String port, String queryFile, int socketId) {
+    public static void passOnResponse(String queryId, String ipAndPort, String queryFile, int socketId) {
         for (TcpSocket socket : connectedTcpSockets) {
             if (socketId != socket.getId()) {
-                socket.writeToPeer("R:" + queryId + ";" + ipAddr + ":" + port + ";" + queryFile + '\n');
+                socket.writeToPeer("R:" + queryId + ";" + ipAndPort + ";" + queryFile + '\n');
             }
         }
     }

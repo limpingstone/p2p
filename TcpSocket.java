@@ -154,14 +154,15 @@ public class TcpSocket extends ServerSocket {
      */
     public String parseStream(String streamStr) {
         if (streamStr != null) {
-            System.out.println("\nMessage: " + streamStr);
+            System.out.println("Message: " + streamStr);
             String queryId = streamStr.substring(2).split(";")[0];
+            String ipAndPort = streamStr.substring(2).split(";")[1];
             String queryFile = parseFileName(streamStr);
             if (streamStr.charAt(0) == 'Q') {
                 TcpSocketController.passOnQuery(queryId, queryFile, getId());
             }
             else if (streamStr.charAt(0) == 'R') {
-                TcpSocketController.passOnResponse(queryId, "0.0.0.0", "123123", queryFile, getId());
+                TcpSocketController.passOnResponse(queryId, ipAndPort, queryFile, getId());
             }
         }
         return streamStr;
