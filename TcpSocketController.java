@@ -126,12 +126,12 @@ public class TcpSocketController {
 
         for (TcpSocket socket : connectedTcpSockets) {
             if (socketId != socket.getId()) {
-                socket.writeToPeer("Q:<query_id>;" + queryFile + '\n');
+                socket.writeToPeer("Q:" + queryId +";" + queryFile + '\n');
                 System.out.println("Passed on the query!");
             }
             else if (ParseFile.fileFound(queryFile)) {
                 for (String match : ParseFile.getExactNames(queryFile))
-                    socket.writeToPeer("R:<query_id>;" + NetworkUtil.getOwnExternalIp() + ":" + getNextAvailableSocket().getLocalPort() + ";" + match + '\n');
+                    socket.writeToPeer("R:" + queryId + ";" + NetworkUtil.getOwnExternalIp() + ":" + getNextAvailableSocket().getLocalPort() + ";" + match + '\n');
             }
 
         }
@@ -143,6 +143,10 @@ public class TcpSocketController {
                 socket.writeToPeer("R:" + queryId + ";" + ipAndPort + ";" + queryFile + '\n');
             }
         }
+    }
+
+    public static int getNewId() {
+        return new Random().nextInt(90000) + 10000;
     }
 }
 
