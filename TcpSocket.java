@@ -128,7 +128,8 @@ public class TcpSocket extends ServerSocket {
             return incomingFromPeer.readLine();
         }
         catch (IOException e) {
-            System.out.println("Peer socket ID " + getId()  + " closed");
+            // Silently handled. After all, the user can always check with commands
+            //System.out.println("Peer socket on port " + getLocalPort()  + " closed");
         }
 
         // Return null if the socket to peer is closed
@@ -154,12 +155,10 @@ public class TcpSocket extends ServerSocket {
      */
     public String parseStream(String streamStr) {
         if (streamStr != null) {
-            System.out.println("Message: " + streamStr);
-
+            //System.out.println("Message from port " + getLocalPort() + ": " + streamStr);
             try {
                 // Strings to be deployed to spawning the query flood
                 String queryId = streamStr.substring(2).split(";")[0];
-                String ipAndPort = streamStr.substring(2).split(";")[1];
                 String queryFile = parseFileName(streamStr);
 
                 // Differentiating between query and response
@@ -167,15 +166,94 @@ public class TcpSocket extends ServerSocket {
                     TcpSocketController.passOnQuery(queryId, queryFile, getId());
                 }
                 else if (streamStr.charAt(0) == 'R') {
+                    String ipAndPort = streamStr.substring(2).split(";")[1];
                     TcpSocketController.passOnResponse(queryId, ipAndPort, queryFile, getId());
+
+                    // If the first response is found, the ID is removed and the file socket is set up
+                    int index = -1;
+                    for (Integer id : TcpSocketController.sentQueries) {
+                        ++index;
+                        if (queryId.equals(id.toString())) {
+                            // Gather IP address and port information for file socket
+                            String ip = ipAndPort.split(":")[0];
+                            int port = Integer.parseInt(ipAndPort.split(":")[1]);
+                            setupFileTransfer(ip, port, queryFile);
+                        }
+                    }
+                    // Mark the query as done
+                    TcpSocketController.sentQueries.remove(index);
+                }
+                else if (streamStr.charAt(0) == 'T') {
+                    String filename = streamStr.split(":")[1];
+                    File fileToPeer = new File("shared/" + filename);
+                    InputStream fileContentStream = new FileInputStream(fileToPeer);
+
+                    // Writing the bytes to the peer while reading the file
+                    int count;
+                    byte[] fileBytes = new byte[(int) fileToPeer.length()];
+                    //System.out.println("Writing to peer");
+                    while ((count = fileContentStream.read(fileBytes)) > 0) {
+                        outboundToPeer.write(fileBytes);
+                    }
+
+                    // Close the socket and the data streams after the file has been transferred
+                    connectionSocket.close();
+                    outboundToPeer.close();
+                    incomingFromPeer.close();
+
+                    // Make the connected socket available
+                    TcpSocketController.socketDisconnected(this.getId());
                 }
             }
             // Check for garbled queries and responses
             catch (IndexOutOfBoundsException e) {
                 System.out.println("1 incomplete response ignored");
             }
+            catch (IOException e) {
+                System.out.println("File transfer failed, please try again");
+            }
         }
         return streamStr;
+    }
+
+    /**
+     * The method that creates a new file socket and transfers the file according to the information provided by the peer
+     * @param ipAddr the IP address in the form of a string
+     * @param port the port number in the form of int
+     * @param filename the name of the file in the form of a string
+     */
+    public void setupFileTransfer(String ipAddr, int port, String filename) {
+        try {
+            // Set up the socket
+            Socket fileSocket = new Socket(ipAddr, port);
+
+            // Set up the inbound and outbound data stream
+            DataOutputStream fileQueryToPeer = new DataOutputStream(fileSocket.getOutputStream());
+            DataInputStream fileFromPeer = new DataInputStream(new BufferedInputStream(fileSocket.getInputStream()));
+
+            // Write the file query to the peer and wait for the file
+            String message = "T:" + filename + '\n';
+            fileQueryToPeer.writeBytes(message);
+
+            //System.out.println("Reading file from port " + fileSocket.getPort() + "...");
+            // Write the content to the file while reading from the incoming stream
+            int count;
+            byte[] fileBytes = new byte[4096];
+            FileOutputStream toObtained = new FileOutputStream(new File("obtained/" + filename));
+            while ((count = fileFromPeer.read(fileBytes)) > 0) {
+                toObtained.write(fileBytes);
+            }
+
+            // Close the socket
+            fileSocket.close();
+            fileQueryToPeer.close();
+            fileFromPeer.close();
+
+            System.out.println("File successfully transferred! Press enter to continue");
+        }
+        catch (IOException e) {
+            System.out.println("File transfer failed, please try again");
+        }
     }
 
     /**

@@ -14,6 +14,9 @@ public class TcpSocketController {
     // The array containing the list of response ID's that has been processed and passed on
     public static ArrayList<String> responseIdList = new ArrayList<String>();
 
+    // The array containing the query ID sent from this peer
+    public static ArrayList<Integer> sentQueries = new ArrayList<Integer>();
+
     /**
      * The static method that initializes all the TCP sockets and add them into the array list of available TCP sockets
      * The IDs are for the TCP sockets to self identify its position in the array list
@@ -184,7 +187,9 @@ public class TcpSocketController {
      * @return a 5-digit integer representing the query ID
      */
     public static int getNewId() {
-        return new Random().nextInt(90000) + 10000;
+        int randomId =  new Random().nextInt(90000) + 10000;
+        sentQueries.add(randomId);
+        return randomId;
     }
 }
 

@@ -19,13 +19,13 @@ public class Command {
 
             // list the available sockets and connected sockets based on the config ports
             case "list":
-                System.out.println("Available Sockets:");
+                System.out.println("Available Ports:");
                 for (TcpSocket socket : TcpSocketController.availableTcpSockets) {
-                    System.out.println(socket.getId());
+                    System.out.println(socket.getLocalPort());
                 }
-                System.out.println("Connected Sockets:");
+                System.out.println("Connected Ports:");
                 for (TcpSocket socket : TcpSocketController.connectedTcpSockets) {
-                    System.out.println(socket.getId());
+                    System.out.println(socket.getLocalPort());
                 }
                 break;
 
