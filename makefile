@@ -12,7 +12,7 @@ clean:
 	rm -f Command.class
 	rm -f PeerTopology*.class
 	rm -f NetworkUtil.class
-	rm -f ParseFile.class
+	rm -f ParseFile*.class
 	rm -f TcpSocket*.class
 	rm -f TcpSocketController.class
 
