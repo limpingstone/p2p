@@ -128,7 +128,7 @@ public class TcpSocket extends ServerSocket {
             return incomingFromPeer.readLine();
         }
         catch (IOException e) {
-            System.out.println("Peer socket closed");
+            System.out.println("Peer socket ID " + getId()  + " closed");
         }
 
         // Return null if the socket to peer is closed
@@ -156,10 +156,12 @@ public class TcpSocket extends ServerSocket {
         if (streamStr != null) {
             System.out.println("Message: " + streamStr);
 
+            // Strings to be deployed to spawning the query flood
             String queryId = streamStr.substring(2).split(";")[0];
             String ipAndPort = streamStr.substring(2).split(";")[1];
             String queryFile = parseFileName(streamStr);
 
+            // Differentiating between query and response
             if (streamStr.charAt(0) == 'Q') {
                 TcpSocketController.passOnQuery(queryId, queryFile, getId());
             }
