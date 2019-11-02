@@ -15,6 +15,7 @@ clean:
 	rm -f ParseFile*.class
 	rm -f TcpSocket*.class
 	rm -f TcpSocketController.class
+	rm -f obtained/*
 
 upload: 
 	scp -r * limpingstone@129.22.22.15:~/Projects/EECS425/p2p
