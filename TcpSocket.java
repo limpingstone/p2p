@@ -156,17 +156,23 @@ public class TcpSocket extends ServerSocket {
         if (streamStr != null) {
             System.out.println("Message: " + streamStr);
 
-            // Strings to be deployed to spawning the query flood
-            String queryId = streamStr.substring(2).split(";")[0];
-            String ipAndPort = streamStr.substring(2).split(";")[1];
-            String queryFile = parseFileName(streamStr);
+            try {
+                // Strings to be deployed to spawning the query flood
+                String queryId = streamStr.substring(2).split(";")[0];
+                String ipAndPort = streamStr.substring(2).split(";")[1];
+                String queryFile = parseFileName(streamStr);
 
-            // Differentiating between query and response
-            if (streamStr.charAt(0) == 'Q') {
-                TcpSocketController.passOnQuery(queryId, queryFile, getId());
+                // Differentiating between query and response
+                if (streamStr.charAt(0) == 'Q') {
+                    TcpSocketController.passOnQuery(queryId, queryFile, getId());
+                }
+                else if (streamStr.charAt(0) == 'R') {
+                    TcpSocketController.passOnResponse(queryId, ipAndPort, queryFile, getId());
+                }
             }
-            else if (streamStr.charAt(0) == 'R') {
-                TcpSocketController.passOnResponse(queryId, ipAndPort, queryFile, getId());
+            // Check for garbled queries and responses
+            catch (IndexOutOfBoundsException e) {
+                System.out.println("1 incomplete response ignored");
             }
         }
         return streamStr;
