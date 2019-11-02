@@ -125,8 +125,21 @@ public class TcpSocketController {
 
         for (TcpSocket socket : connectedTcpSockets) {
             if (socketId != socket.getId()) {
-                socket.writeToPeer("Q:<query_id>; " + queryFile + '\n');
+                socket.writeToPeer("Q:<query_id>;" + queryFile + '\n');
                 System.out.println("Passed on the query!");
+            }
+            else if (ParseFile.fileFound(queryFile)) {
+                for (String match : ParseFile.getExactNames(queryFile))
+                    socket.writeToPeer("R:<query_id>;peer_ip:port;" + match + '\n');
+            }
+
+        }
+    }
+
+    public static void passOnResponse(String queryId, String ipAddr, String port, String queryFile, int socketId) {
+        for (TcpSocket socket : connectedTcpSockets) {
+            if (socketId != socket.getId()) {
+                socket.writeToPeer("R:" + queryId + ";" + ipAddr + ":" + port + ";" + queryFile + '\n');
             }
         }
     }

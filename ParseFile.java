@@ -56,4 +56,45 @@ public class ParseFile {
             System.out.println("Error writing to config_neighbors.txt");
         }
     }
+
+    /**
+     * The static method that searches whether the indicated file exists
+     * @param searchedName the name of the file in the form of string
+     * @return true if the file is found in the obtained folder
+     */
+    public static boolean fileFound(String searchedName) {
+        final String filename = searchedName;
+        File obtainedDir = new File("obtained");
+
+        File[] searchResult = obtainedDir.listFiles(new FilenameFilter() {
+            public boolean accept(File file, String name) {
+                return name.startsWith(filename);
+            }
+        });
+
+        return searchResult.length > 0;
+    }
+
+    /**
+     * The static method that returns the list of files with matched filenames
+     * @param searchedName the name of the file in the form of string
+     * @return the list of file names found in the obtained folder
+     */
+    public static ArrayList<String> getExactNames(String searchedName) {
+        final String filename = searchedName;
+        File obtainedDir = new File("obtained");
+
+        File[] searchResult = obtainedDir.listFiles(new FilenameFilter() {
+            public boolean accept(File file, String name) {
+                return name.startsWith(filename);
+            }
+        });
+
+        ArrayList<String> matches = new ArrayList<String>();
+        for (File match : searchResult) {
+            matches.add(match.getName());
+        }
+
+        return matches;
+    }
 }

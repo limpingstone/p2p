@@ -154,10 +154,29 @@ public class TcpSocket extends ServerSocket {
      */
     public String parseStream(String streamStr) {
         if (streamStr != null) {
-            System.out.println("\nMessage from socket: " + streamStr);
-            TcpSocketController.passOnQuery(streamStr.substring(2).split(";")[0], streamStr.split(";")[1].substring(1), getId());
+            System.out.println("\nMessage: " + streamStr);
+            String queryId = streamStr.substring(2).split(";")[0];
+            String queryFile = parseFileName(streamStr);
+            if (streamStr.charAt(0) == 'Q') {
+                TcpSocketController.passOnQuery(queryId, queryFile, getId());
+            }
+            else if (streamStr.charAt(0) == 'R') {
+                TcpSocketController.passOnResponse(queryId, "0.0.0.0", "123123", queryFile, getId());
+            }
         }
         return streamStr;
+    }
+
+    /**
+     * The method that parses the file name and checks for extra carriage returns
+     * @param filename the last argument of a query
+     * @return a string with clean file name without carriage returns
+     */
+    public String parseFileName(String streamStr) {
+        if (streamStr.charAt(streamStr.length() - 1) == '\n')
+            streamStr = streamStr.substring(0, streamStr.length() - 1);
+        String[] splitStr = streamStr.split(";");
+        return splitStr[splitStr.length - 1];
     }
 
     public int getLocalPort() {

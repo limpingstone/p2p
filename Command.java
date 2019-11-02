@@ -29,6 +29,11 @@ public class Command {
                 }
                 break;
 
+            // find file in obtained folder
+            case "findfile":
+                ParseFile.fileFound("send_me.txt");
+                break;
+
             // connect to a peer with the provided IP address and port
             case "Connect":
             case "connect":
@@ -119,8 +124,8 @@ public class Command {
      */
     public static void getFile(String filename) {
         for (TcpSocket activeSocket : TcpSocketController.connectedTcpSockets) {
-            System.out.println("Sent query to " + activeSocket.getLocalPort());
-            activeSocket.writeToPeer("Q:<query_id>; " + filename + '\n');
+            System.out.println("Sent query to " + activeSocket.getLocalPort(), ". Waiting for response...");
+            activeSocket.writeToPeer("Q:<query_id>;" + filename + '\n');
         }
     }
 }
