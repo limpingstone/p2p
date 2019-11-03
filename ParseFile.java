@@ -10,7 +10,7 @@ public class ParseFile {
             BufferedReader br = new BufferedReader(new FileReader(configPeerFile));
 
             String portStr;
-            int id = 1000;
+            int id = 0;
             while ((portStr = br.readLine()) != null)
                 TcpSocketController.availableTcpSockets.add(new TcpSocket(Integer.parseInt(portStr), id++));
         }

@@ -65,6 +65,7 @@ public class TcpSocket extends ServerSocket {
                 connectionSocket = this.accept();
             }
             TcpSocketController.socketConnected(this.getId());
+            System.out.println("Accepted connection on port " + getLocalPort());
 
             setupDataTransfer();
         }
@@ -129,7 +130,7 @@ public class TcpSocket extends ServerSocket {
         }
         catch (IOException e) {
             // Silently handled. After all, the user can always check with commands
-            //System.out.println("Peer socket on port " + getLocalPort()  + " closed");
+            System.out.println("Peer socket on port " + getLocalPort()  + " closed");
         }
 
         // Return null if the socket to peer is closed
@@ -155,7 +156,7 @@ public class TcpSocket extends ServerSocket {
      */
     public String parseStream(String streamStr) {
         if (streamStr != null) {
-            //System.out.println("Message from port " + getLocalPort() + ": " + streamStr);
+            System.out.println("\nMessage from port " + getLocalPort() + ": " + streamStr);
             try {
                 // Strings to be deployed to spawning the query flood
                 String queryId = streamStr.substring(2).split(";")[0];
@@ -191,10 +192,11 @@ public class TcpSocket extends ServerSocket {
                     // Writing the bytes to the peer while reading the file
                     int count;
                     byte[] fileBytes = new byte[(int) fileToPeer.length()];
-                    //System.out.println("Writing to peer");
+                    System.out.println("Writing to peer...");
                     while ((count = fileContentStream.read(fileBytes)) > 0) {
                         outboundToPeer.write(fileBytes);
                     }
+                    System.out.println("File transfer DONE");
 
                     // Close the socket and the data streams after the file has been transferred
                     connectionSocket.close();
@@ -207,9 +209,11 @@ public class TcpSocket extends ServerSocket {
             }
             // Check for garbled queries and responses
             catch (IndexOutOfBoundsException e) {
-                System.out.println("1 incomplete response ignored");
+                // Silent fail, should not be the fault of the sender
+                System.out.println("1 incomplete query ignored");
             }
             catch (IOException e) {
+                // Occurs during the case of T
                 System.out.println("File transfer failed, please try again");
             }
         }
@@ -232,10 +236,11 @@ public class TcpSocket extends ServerSocket {
             DataInputStream fileFromPeer = new DataInputStream(new BufferedInputStream(fileSocket.getInputStream()));
 
             // Write the file query to the peer and wait for the file
+            System.out.println("Requesting peer on " + ipAddr + " for " + filename);
             String message = "T:" + filename + '\n';
             fileQueryToPeer.writeBytes(message);
 
-            //System.out.println("Reading file from port " + fileSocket.getPort() + "...");
+            System.out.println("Reading file from port " + fileSocket.getPort() + "...");
             // Write the content to the file while reading from the incoming stream
             int count;
             byte[] fileBytes = new byte[4096];

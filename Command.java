@@ -18,6 +18,7 @@ public class Command {
                 return;
 
             // list the available sockets and connected sockets based on the config ports
+            case "List":
             case "list":
                 System.out.println("Available Ports:");
                 for (TcpSocket socket : TcpSocketController.availableTcpSockets) {
@@ -25,13 +26,8 @@ public class Command {
                 }
                 System.out.println("Connected Ports:");
                 for (TcpSocket socket : TcpSocketController.connectedTcpSockets) {
-                    System.out.println(socket.getLocalPort());
+                    System.out.println(socket.getLocalPort() + " - connected to " + socket.getConnectionSocket().getRemoteSocketAddress());
                 }
-                break;
-
-            // find file in obtained folder
-            case "findfile":
-                ParseFile.fileFound("send_me.txt");
                 break;
 
             // connect to a peer with the provided IP address and port
@@ -40,7 +36,7 @@ public class Command {
                 try {
                     connect(param[1], param[2]);
                 }
-                catch (IndexOutOfBoundsException e) {
+                catch (IndexOutOfBoundsException | NumberFormatException e) {
                     help(true);
                 }
                 break;
@@ -101,7 +97,8 @@ public class Command {
         }
         System.out.println("List of commands: ");
         System.out.println("Connect [ip-address] [port] - connect to the peer with the designated IP address and port number");
-        System.out.println("Get - ");
+        System.out.println("Get [filename] - send queries to peer to request for designated file");
+        System.out.println("List - list the status of the sockets and the active connections");
         System.out.println("Leave - close all TCP connections with neighboring peers");
         System.out.println("Help - print this help menu");
         System.out.println("Exit - close all TCP connections and terminates the program\n");
@@ -124,8 +121,11 @@ public class Command {
      */
     public static void getFile(String filename) {
         for (TcpSocket activeSocket : TcpSocketController.connectedTcpSockets) {
-            System.out.println("Sent query to port " + activeSocket.getLocalPort() + ". Waiting for response...");
-            activeSocket.writeToPeer("Q:" + TcpSocketController.getNewId() + ";" + filename + '\n');
+
+            // Initiate a new ID for the query
+            final int newId = TcpSocketController.getNewId();
+            System.out.println("Sent query to port " + activeSocket.getLocalPort() + ". Query ID = " + newId);
+            activeSocket.writeToPeer("Q:" + newId + ";" + filename + '\n');
         }
     }
 }
